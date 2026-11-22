@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>选择身份</title>
+    <!-- 让手机浏览器地址栏/状态栏也跟着浅色、深色主题变色 -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F4F7FC">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0F1C">
+    <style>
+       *,
+       *::before,
+       *::after{
+           box-sizing: border-box;
+       }
+
+       /* ===== 主题变量：浅色为默认，深色在下面 @media 里覆盖 ===== */
+       :root{
+           /* 告诉浏览器这是双主题页面，滚动条、表单控件、默认底色会一起适配 */
+           color-scheme: light dark;
+
+           /* 背景 */
+           --bg:        #F4F7FC;
+           --bg-top:    #FBFDFF;
+           --bg-bottom: #E9F0F9;
+           --glow:      rgba(0, 0, 205, .10);
+
+           /* 方块 */
+           --box-bg:     #0000CD;
+           --box-border: #87CEFA;
+           --box-text:   #FF8C00;
+           --box-text-hover: #DC143C;
+
+           /* 标题 */
+           --title-from: #0000CD;
+           --title-to:   #FF8C00;
+           --title-glow: rgba(0, 0, 205, .22);
+           --rule:       rgba(0, 0, 205, .38);
+           --text-muted: #5A6A80;
+
+           /* 阴影 */
+           --shadow:      0 10px 28px rgba(15, 30, 90, .16);
+           --shadow-hover:0 18px 40px rgba(15, 30, 90, .22);
+       }
+
+       @media (prefers-color-scheme: dark){
+           :root{
+               --bg:        #0A0F1C;
+               --bg-top:    #0D1424;
+               --bg-bottom: #070A14;
+               --glow:      rgba(90, 120, 255, .18);
+
+               --box-bg:     #1A28B8;
+               --box-border: #6FA8E8;
+               --box-text:   #FFB566;
+               --box-text-hover: #FF6F61;
+
+               --title-from: #93ABFF;
+               --title-to:   #FFC078;
+               --title-glow: rgba(120, 150, 255, .30);
+               --rule:       rgba(140, 165, 255, .45);
+               --text-muted: #8C9AB5;
+
+               --shadow:      0 10px 28px rgba(0, 0, 0, .55);
+               --shadow-hover:0 18px 40px rgba(0, 0, 0, .65);
+           }
+       }
+
+       html,
+       body{
+           height: 100%;
+       }
+
+       body{
+           margin: 0;
+           /* 整个页面永远是视口大小，内容在水平和垂直方向都居中 */
+           min-height: 100dvh;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+                    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+           overflow: hidden;
+
+           /* 干净的纯色打底 + 纵向微渐变 + 顶部一团极淡的光，无图片、零请求 */
+           background-color: var(--bg);
+           background-image:
+               radial-gradient(70% 55% at 50% -10%, var(--glow), transparent 65%),
+               linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+
+           transition: background-color .3s ease;
+       }
+
+       /* 标题 + 四个方块，整体作为一个竖排舞台一起居中 */
+       .page{
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           gap: clamp(20px, 5vmin, 60px);
+           max-width: 100%;
+           animation: rise .6s ease both;
+       }
+
+       @keyframes rise{
+           from{ opacity: 0; transform: translateY(14px); }
+           to  { opacity: 1; transform: none; }
+       }
+
+       /* ---------- 标题区 ---------- */
+       .hero{
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           gap: clamp(6px, 1.2vmin, 14px);
+           text-align: center;
+       }
+
+       .hero__title{
+           margin: 0;
+           /* 正楷：优先 Windows 的「楷体」，其次华文楷体 / 苹果的楷体 */
+           font-family: "KaiTi", "楷体", "STKaiti", "华文楷体",
+                        "Kaiti SC", "Songti SC", serif;
+           font-weight: 700;
+           font-size: clamp(26px, 6.5vmin, 64px);
+           line-height: 1.15;
+           /* 字距拉开更显端庄；text-indent 与字距相等，抵消末字右侧空隙，保证视觉正中 */
+           letter-spacing: .16em;
+           text-indent: .16em;
+           /* 品牌双色渐变字：深蓝 → 橙，与四个方块呼应 */
+           background-image: linear-gradient(120deg, var(--title-from) 15%, var(--title-to) 85%);
+           -webkit-background-clip: text;
+           background-clip: text;
+           color: transparent;
+           -webkit-text-fill-color: transparent;
+           filter: drop-shadow(0 6px 18px var(--title-glow));
+       }
+
+       /* 不支持文字裁切渐变的浏览器退回纯色 */
+       @supports not ((-webkit-background-clip: text) or (background-clip: text)){
+           .hero__title{
+               color: var(--title-from);
+               -webkit-text-fill-color: currentColor;
+           }
+       }
+
+       /* 标题下的短装饰线 */
+       .hero__rule{
+           width: clamp(56px, 14vmin, 132px);
+           height: 3px;
+           border-radius: 999px;
+           background: linear-gradient(90deg, transparent, var(--title-from), var(--title-to), transparent);
+           opacity: .9;
+       }
+
+       .hero__subtitle{
+           margin: 0;
+           font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+           font-size: clamp(12px, 1.9vmin, 16px);
+           letter-spacing: .28em;
+           text-indent: .28em;
+           color: var(--text-muted);
+       }
+
+       /* ---------- 2 x 2 网格：本身居中，格子随视口缩放 ---------- */
+       .grid{
+           display: grid;
+           grid-template-columns: repeat(2, auto);
+           gap: clamp(12px, 3.5vmin, 40px);
+           place-content: center;
+       }
+
+       .box{
+           /* 同时受宽、高、最大尺寸约束：窄屏不会溢出，大屏也不会过分放大 */
+           width: min(40vmin, 250px);
+           height: min(40vmin, 250px);
+           background-color: var(--box-bg);
+           border: clamp(3px, 0.6vmin, 5px) solid var(--box-border);
+           box-shadow: var(--shadow);
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           font-family: "华文行楷", "STXingkai", "KaiTi", serif;
+           font-size: clamp(16px, 7vmin, 70px);
+           line-height: 1.1;
+           text-align: center;
+           transition: transform .25s ease, box-shadow .25s ease,
+                       background-color .3s ease, border-color .3s ease;
+       }
+
+       /* 四个方块保留各自的不对称圆角，圆角按百分比随方块缩放 */
+       .box1{
+           border-radius: 6% 14% 42% 14%;
+       }
+
+       .box2{
+           border-radius: 14% 6% 14% 42%;
+       }
+
+       .box3{
+           border-radius: 14% 42% 14% 6%;
+       }
+
+       .box4{
+           border-radius: 42% 14% 6% 14%;
+       }
+
+       .box:hover{
+           transform: translateY(-4px) scale(1.03);
+           box-shadow: var(--shadow-hover);
+       }
+
+       a{
+           /* 让整个方块都能点击 */
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           width: 100%;
+           height: 100%;
+           text-decoration: none;
+           color: var(--box-text);
+           font-weight: bold;
+           transition: color .25s ease;
+       }
+
+       a:hover{
+           color: var(--box-text-hover);
+       }
+
+       /* 横屏手机这种高度很矮的情况：标题缩小、去掉副标题，保证一屏放得下 */
+       @media (max-height: 480px) and (orientation: landscape){
+           .page{
+               gap: clamp(10px, 2.5vmin, 20px);
+           }
+           .hero{
+               gap: 6px;
+           }
+           .hero__title{
+               font-size: clamp(16px, 4.2vmin, 30px);
+           }
+           .hero__rule{
+               width: clamp(40px, 10vmin, 80px);
+               height: 2px;
+           }
+           .hero__subtitle{
+               display: none;
+           }
+           .box{
+               width: min(32vmin, 250px);
+               height: min(32vmin, 250px);
+               font-size: clamp(14px, 6vmin, 46px);
+           }
+           .grid{
+               gap: clamp(8px, 2vmin, 24px);
+           }
+       }
+
+       /* 用户系统里开了"减少动态效果"时，去掉位移、缩放和入场动画 */
+       @media (prefers-reduced-motion: reduce){
+           *,
+           *::before,
+           *::after{
+               transition-duration: .01ms !important;
+               animation-duration: .01ms !important;
+           }
+           .page{
+               animation: none;
+           }
+           .box:hover{
+               transform: none;
+           }
+       }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <header class="hero">
+            <h1 class="hero__title">选择身份</h1>
+            <div class="hero__rule" aria-hidden="true"></div>
+            <p class="hero__subtitle">请选择你的身份进入系统</p>
+        </header>
+
+        <div class="grid">
+            <div class="box box1">
+                <a href="#" target="_self">成员</a>
+            </div>
+            <div class="box box2">
+                <a href="#" target="_self">老师</a>
+            </div>
+            <div class="box box3">
+                <a href="#" target="_self">财务</a>
+            </div>
+            <div class="box box4">
+                <a href="#" target="_self">管理员</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
